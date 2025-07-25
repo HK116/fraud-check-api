@@ -1,0 +1,42 @@
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# VS Code settings
+.vscode/
+
+# MacOS and system files
+.DS_Store
+
+# Environment files
+.env
+.env.*
+
+# Pytest cache
+.pytest_cache/
+.cache/
+
+# Coverage reports
+htmlcov/
+coverage.xml
+*.cover
+
+# Docker
+*.log
+*.pid
+*.db
+*.sqlite3
+
+# MyPy
+.mypy_cache/
+
+# FastAPI auto-generated files (if any)
+*.log
