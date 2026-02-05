@@ -1,42 +1,19 @@
-from datetime import datetime
-from app.rules import check_rules
+from app.schemas import Transaction
+from app.engine import evaluate_transaction
 
-# Test Rule 1: Exceed amount threshold
-def test_amount_threshold_triggered():
-    trnscn= {
-        "amount": 2500, # above 2000
-        "ip_country": "PL",
-        "billing_country": "PL",
-        "timestamp": datetime(2025, 7, 25, 14, 0), # safe hour
-    }
-    assert "exceeded_amount_threshold" in check_rules(trnscn)
 
-# Test Rule 2: IP mismatch
-def test_ip_mismatch_triggered():
-    trnscn= {
-        "amount": 100,
-        "ip_country": "US" ,
-        "billing_country": "PL",
-        "timestamp": datetime(2025, 7, 25, 14, 0),
-    }
-    assert "ip_country_mismatch" in check_rules(trnscn)
+def test_high_risk_transaction():
+    tx = Transaction(
+        transaction_id="tx1",
+        user_id="user1",
+        amount=2000,
+        country="NG",
+        timestamp="2025-01-01T10:00:00"
+    )
 
-# Test Rule 3: Odd hour
-def test_odd_hour_triggered():
-    trnscn= {
-        "amount": 100,
-        "ip_country": "PL",
-        "billing_country": "PL",
-        "timestamp": datetime(2025, 7, 25, 4, 0), # 4am
-    }
-    assert "odd_transaction_hour" in check_rules(trnscn)
+    result = evaluate_transaction(tx)
 
-# Test when no rules match
-def test_no_fraud_detected():
-    trnscn= {
-        "amount": 100,
-        "ip_country": "PL",
-        "billing_country": "PL",
-        "timestamp": datetime(2025, 7, 25, 14, 0),
-    }
-    assert check_rules(trnscn) == []
+    assert result.is_fraud is True
+    assert "HIGH_AMOUNT" in result.triggered_rules
+    assert "RISKY_COUNTRY" in result.triggered_rules
+    assert result.risk_score == 100
